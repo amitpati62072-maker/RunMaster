@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#050505">
+<meta name="description" content="Run Master GPS running tracker with live route, laps, pace and running history.">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" href="./icons/icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="./icons/icon-192.png">
+
+<title>Run Master</title>
+<link rel="preconnect" href="https://unpkg.com">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+:root{--bg:#050505;--panel:#111;--panel2:#171717;--line:#303030;--red:#ff3038;--muted:#929292;--white:#f7f7f7;--green:#36d399}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--white);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;padding-bottom:86px}
+button,input,select{font:inherit}button{cursor:pointer;border:0}.app{max-width:520px;margin:auto;min-height:100vh}.top{padding:18px 18px 12px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #171717;position:sticky;top:0;background:#050505ed;backdrop-filter:blur(12px);z-index:500}.brand{display:flex;align-items:center;gap:10px}.logo{width:38px;height:38px;border:2px solid var(--red);border-radius:12px;display:grid;place-items:center;color:var(--red);font-size:21px}.brand b{font-size:18px;letter-spacing:.5px}.brand small{display:block;color:var(--muted);font-size:10px;letter-spacing:2px}.avatar{width:38px;height:38px;border:1px solid #444;border-radius:50%;background:#181818;color:#fff;font-weight:700}
+.page{display:none;padding:16px}.page.active{display:block}.section-title{font-size:17px;font-weight:800;margin:8px 0 13px}.muted{color:var(--muted)}.tiny{font-size:11px;color:var(--muted)}.card{background:linear-gradient(145deg,#151515,#0d0d0d);border:1px solid var(--line);border-radius:18px;padding:15px;margin-bottom:13px}.hero{padding:17px;background:radial-gradient(circle at 85% 10%,#4c1115 0,#171010 34%,#101010 70%);border-color:#552025}.eyebrow{color:#ff8a8f;font-size:10px;letter-spacing:2px;font-weight:800}.hero-row{display:flex;align-items:center;justify-content:space-between}.hero h1{font-size:25px;margin:5px 0}.pill{font-size:10px;border:1px solid #583035;color:#ff9ba0;border-radius:30px;padding:6px 9px}.metrics{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0}.metric{background:#101010;border:1px solid #292929;border-radius:14px;padding:13px;min-width:0}.metric .label{color:var(--muted);font-size:10px;letter-spacing:1px;text-transform:uppercase}.metric strong{display:block;font-size:25px;margin-top:5px;white-space:nowrap}.metric small{font-size:11px;color:var(--muted)}.metric.primary{border-color:#70252b}.metric.primary strong{color:#ff5158;font-size:31px}.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}.btn{padding:14px 12px;border-radius:13px;font-weight:800;color:#fff;background:#262626;border:1px solid #3a3a3a}.btn.red{background:var(--red);border-color:var(--red);color:#fff}.btn.outline{background:transparent;border-color:#733039;color:#ff8c91}.btn:disabled{opacity:.35;cursor:not-allowed}.btn.full{width:100%}.map-wrap{height:310px;border-radius:15px;overflow:hidden;border:1px solid #333;background:#171717;position:relative}.map-wrap.large{height:430px}#map,#groundMap{height:100%;width:100%;background:#161616}.map-note{position:absolute;z-index:400;bottom:10px;left:10px;background:#080808df;padding:7px 10px;border-radius:8px;font-size:10px;color:#ddd}.leaflet-container{background:#151515}.leaflet-control-attribution{font-size:8px!important}.leaflet-control-zoom a{background:#111!important;color:#fff!important;border-color:#333!important}.progress{height:8px;background:#292929;border-radius:20px;overflow:hidden;margin:10px 0}.progress span{display:block;height:100%;width:0;background:linear-gradient(90deg,#ff3038,#ff7b54);border-radius:20px}.row{display:flex;justify-content:space-between;align-items:center;gap:10px}.row.wrap{flex-wrap:wrap}.goal-input{width:74px;background:#090909;border:1px solid #444;border-radius:9px;color:white;padding:8px}.nav{position:fixed;bottom:0;left:0;right:0;z-index:800;background:#0b0b0bf2;border-top:1px solid #292929;display:flex;justify-content:center;padding:8px 4px calc(8px + env(safe-area-inset-bottom));backdrop-filter:blur(14px)}.nav-inner{width:100%;max-width:520px;display:grid;grid-template-columns:repeat(4,1fr);gap:4px}.nav button{background:none;color:#777;padding:7px 2px;font-size:10px;display:grid;justify-items:center;gap:4px}.nav button span{font-size:19px}.nav button.active{color:#ff4b52}.statline{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #252525;font-size:13px}.statline:last-child{border:0}.field{display:flex;flex-direction:column;gap:6px;margin:10px 0}.field label{font-size:11px;color:#aaa}.field input,.field select{background:#090909;border:1px solid #3a3a3a;border-radius:10px;padding:12px;color:white;width:100%;outline:none}.toggle{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid #252525;font-size:13px}.toggle input{accent-color:var(--red);width:18px;height:18px}.history-item{padding:13px;border:1px solid #303030;border-radius:13px;margin:9px 0;background:#111}.history-item h3{font-size:14px;margin:0 0 8px}.history-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.history-grid div{font-size:11px;color:#aaa}.history-grid b{display:block;color:#fff;font-size:14px;margin-top:3px}.empty{text-align:center;padding:28px 10px;color:#777}.record-dot{display:inline-block;width:7px;height:7px;background:#ff3d45;border-radius:50%;margin-right:5px;box-shadow:0 0 10px #ff3d45}.lap-row{display:grid;grid-template-columns:.6fr 1fr 1fr 1fr;padding:9px 2px;border-bottom:1px solid #282828;font-size:12px}.lap-row.head{color:#888;font-size:10px;text-transform:uppercase}.toast{position:fixed;left:50%;bottom:95px;transform:translateX(-50%);background:#eee;color:#111;padding:10px 15px;border-radius:10px;font-size:12px;z-index:2000;opacity:0;pointer-events:none;transition:.2s;max-width:90%;text-align:center}.toast.show{opacity:1}.danger{color:#ff7278}.disclaimer{font-size:10px;line-height:1.5;color:#777}.big-time{font-size:36px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:1px}.hidden{display:none!important}
+@media(min-width:520px){body{padding-bottom:95px}.top{border-left:1px solid #161616;border-right:1px solid #161616}}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top"><div class="brand"><div class="logo">↗</div><div><b>RUN MASTER</b><small>RUN • TRACK • IMPROVE</small></div></div><button class="avatar" id="profileBtn" aria-label="Profile">RM</button></header>
+
+<main>
+<section class="page active" id="homePage">
+  <div class="card hero">
+    <div class="hero-row"><div><div class="eyebrow">YOUR RUNNING DASHBOARD</div><h1>Ready to move?</h1><div class="tiny" id="gpsStatus">GPS waiting for permission</div></div><span class="pill" id="runState">● NOT RUNNING</span></div>
+    <div class="metrics">
+      <div class="metric primary"><div class="label">Distance</div><strong id="distance">0.00</strong><small>kilometres</small></div>
+      <div class="metric"><div class="label">Time</div><strong id="elapsed">00:00</strong><small>hh:mm:ss when needed</small></div>
+      <div class="metric"><div class="label">Current speed</div><strong id="speed">0.0</strong><small>km/h</small></div>
+      <div class="metric"><div class="label">Average pace</div><strong id="pace">—</strong><small>min/km</small></div>
+    </div>
+    <div class="actions">
+      <button class="btn red" id="startBtn">▶ START RUN</button>
+      <button class="btn" id="pauseBtn" disabled>Ⅱ PAUSE</button>
+    </div>
+    <button class="btn outline full" id="stopBtn" style="margin-top:9px" disabled>■ FINISH RUN</button>
+  </div>
+  <div class="row"><div class="section-title">Live route</div><span class="tiny" id="accuracy">GPS accuracy: —</span></div>
+  <div class="map-wrap"><div id="map"></div><div class="map-note">OPENSTREETMAP · Live GPS route</div></div>
+  <div class="metrics">
+    <div class="metric"><div class="label">Average speed</div><strong id="avgSpeed">0.0</strong><small>km/h</small></div>
+    <div class="metric"><div class="label">Top speed</div><strong id="maxSpeed">0.0</strong><small>km/h</small></div>
+    <div class="metric"><div class="label">Daily goal</div><strong id="goalDistance">0 / 5</strong><small>km completed</small><div class="progress"><span id="goalBar"></span></div></div>
+    <div class="metric"><div class="label">Calories*</div><strong id="calories">0</strong><small>estimated kcal</small></div>
+  </div>
+  <div class="card"><div class="row"><b>Today’s progress</b><span class="tiny" id="todayRuns">0 runs</span></div><div class="progress"><span id="todayBar"></span></div><div class="tiny">*Calories are a rough estimate. Set your weight in Settings for a better estimate.</div></div>
+</section>
+
+<section class="page" id="groundPage">
+  <div class="section-title">Ground running</div>
+  <div class="card">
+    <div class="row"><b>Track / lap setup</b><span class="pill">GROUND MODE</span></div>
+    <div class="field"><label>One lap distance (metres)</label><input id="lapLength" type="number" min="50" max="5000" value="400"></div>
+    <div class="toggle"><span>Auto lap by distance</span><input id="autoLap" type="checkbox" checked></div>
+    <div class="tiny">Auto lap records each time you cover the set lap distance. Use Manual Lap if GPS is inaccurate on a small ground.</div>
+  </div>
+  <div class="map-wrap"><div id="groundMap"></div><div class="map-note">Ground route · GPS based</div></div>
+  <div class="metrics">
+    <div class="metric primary"><div class="label">Laps completed</div><strong id="lapCount">0</strong><small>laps</small></div>
+    <div class="metric"><div class="label">Lap distance</div><strong id="lapMeters">400</strong><small>metres / lap</small></div>
+  </div>
+  <div class="actions"><button class="btn red" id="manualLap">＋ MANUAL LAP</button><button class="btn" id="groundStart">▶ START RUN</button></div>
+  <div class="card" style="margin-top:13px"><div class="row"><b>Lap splits</b><span class="tiny">Time per lap</span></div><div class="lap-row head"><span>Lap</span><span>Distance</span><span>Time</span><span>Pace</span></div><div id="lapList"><div class="empty">Your lap splits will appear here.</div></div></div>
+</section>
+
+<section class="page" id="historyPage">
+  <div class="row"><div class="section-title">Running history</div><button class="btn outline" id="exportCsv" style="padding:8px 11px;font-size:11px">Export CSV</button></div>
+  <div class="metrics">
+    <div class="metric"><div class="label">Total distance</div><strong id="totalDistance">0.0</strong><small>km all time</small></div>
+    <div class="metric"><div class="label">Total time</div><strong id="totalTime">0h</strong><small>all runs</small></div>
+    <div class="metric"><div class="label">Best 1 km pace</div><strong id="bestPace">—</strong><small>recorded average</small></div>
+    <div class="metric"><div class="label">Total sessions</div><strong id="totalRuns">0</strong><small>saved runs</small></div>
+  </div>
+  <div id="historyList"><div class="empty">No runs saved yet. Complete your first run!</div></div>
+</section>
+
+<section class="page" id="settingsPage">
+  <div class="section-title">Settings</div>
+  <div class="card">
+    <div class="row"><b>Profile</b><span class="tiny">Personal details</span></div>
+    <div class="field"><label>Your name</label><input id="userName" placeholder="Runner"></div>
+    <div class="field"><label>Weight (kg)</label><input id="weight" type="number" min="25" max="250" value="60"></div>
+    <div class="field"><label>Daily running goal (km)</label><input id="dailyGoal" type="number" min="0.1" max="100" step="0.1" value="5"></div>
+    <button class="btn red full" id="saveSettings">SAVE SETTINGS</button>
+  </div>
+  <div class="card">
+    <b>Running preferences</b>
+    <div class="toggle"><span>Voice announcements</span><input type="checkbox" id="voiceEnabled" checked></div>
+    <div class="field"><label>Voice language</label><select id="voiceLang"><option value="both">Hindi + English</option><option value="hi">Hindi</option><option value="en">English</option></select></div>
+    <div class="field"><label>Announcement interval</label><select id="announceEvery"><option value="0.5">Every 500 metres</option><option value="1" selected>Every 1 kilometre</option><option value="2">Every 2 kilometres</option></select></div>
+    <div class="toggle"><span>Auto pause (when nearly stopped)</span><input type="checkbox" id="autoPause"></div>
+    <div class="toggle"><span>Keep screen awake while running (if supported)</span><input type="checkbox" id="wakeLock" checked></div>
+  </div>
+  <div class="card">
+    <b>Data & permissions</b>
+    <p class="disclaimer">Your run history is saved in this browser on this device. Clearing browser data may delete it. Location access is used only while tracking. Internet is needed to load the map tiles.</p>
+    <button class="btn full" id="exportJson">BACK UP RUN DATA (JSON)</button>
+    <button class="btn full danger" id="clearHistory" style="margin-top:9px">DELETE ALL RUN HISTORY</button>
+  </div>
+  <div class="card"><b>About Run Master</b><p class="disclaimer">GPS accuracy depends on your phone, surroundings and location permission. Keep this page open during a run; a single HTML page cannot guarantee reliable tracking or voice while the phone is locked or the browser is suspended. For dependable background tracking, a native Android app is recommended.</p><div class="tiny">RUN MASTER · VERSION 1.0</div></div>
+</section>
+</main>
+<nav class="nav"><div class="nav-inner">
+<button class="active" data-page="homePage"><span>⌂</span>Home</button>
+<button data-page="groundPage"><span>◎</span>Ground</button>
+<button data-page="historyPage"><span>▤</span>History</button>
+<button data-page="settingsPage"><span>⚙</span>Settings</button>
+</div></nav>
+<div class="toast" id="toast"></div>
+</div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+(()=>{'use strict';
+const $=id=>document.getElementById(id);
+const KEY='runmaster_data_v1';
+let db=loadDB(), map=null,groundMap=null,routeLine=null,groundLine=null,marker=null,groundMarker=null;
+let watchId=null,timer=null,run=null,wakeLockRef=null,lastAnnouncement=0,lastAutoPause=0;
+let laps=[];
+function loadDB(){try{return JSON.parse(localStorage.getItem(KEY))||{runs:[],settings:{}}}catch(e){return{runs:[],settings:{}}}}
+function persist(){try{localStorage.setItem(KEY,JSON.stringify(db))}catch(e){toast('Storage full: export your backup.')}} 
+function toast(s){const t=$('toast');t.textContent=s;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2400)}
+function fmtTime(sec){sec=Math.max(0,Math.floor(sec||0));let h=Math.floor(sec/3600),m=Math.floor(sec%3600/60),s=sec%60;return h?`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`:`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`}
+function pace(km,sec){if(km<=0||!isFinite(sec))return'—';let v=sec/km;return `${Math.floor(v/60)}:${String(Math.floor(v%60)).padStart(2,'0')}`}
+function haversine(a,b){const R=6371000,toRad=x=>x*Math.PI/180,dLat=toRad(b.lat-a.lat),dLon=toRad(b.lng-a.lng),x=Math.sin(dLat/2)**2+Math.cos(toRad(a.lat))*Math.cos(toRad(b.lat))*Math.sin(dLon/2)**2;return 2*R*Math.asin(Math.sqrt(x))}
+function elapsed(){return run?run.elapsedBefore+(run.paused?0:(Date.now()-run.startedAt)/1000):0}
+function currentSpeed(){return run?run.currentSpeed||0:0}
+function totalToday(){let d=new Date().toDateString();return db.runs.filter(r=>new Date(r.date).toDateString()===d).reduce((a,r)=>a+r.distance,0)}
+function initMap(){if(!window.L){$('gpsStatus').textContent='Map library unavailable · check internet';return}
+ const base={zoomControl:true,attributionControl:true};
+ map=L.map('map',base).setView([23.5,80],5);groundMap=L.map('groundMap',base).setView([23.5,80],5);
+ const tile='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+ [map,groundMap].forEach(m=>L.tileLayer(tile,{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(m));
+ routeLine=L.polyline([],{color:'#ff3038',weight:5,opacity:.9}).addTo(map);
+ groundLine=L.polyline([],{color:'#ff3038',weight:5,opacity:.9}).addTo(groundMap);
+ setTimeout(()=>{map.invalidateSize();groundMap.invalidateSize()},300);
+}
+function showPage(id){document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id===id));document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===id));if(id==='homePage'&&map)setTimeout(()=>map.invalidateSize(),100);if(id==='groundPage'&&groundMap)setTimeout(()=>groundMap.invalidateSize(),100);if(id==='historyPage')renderHistory()}
+document.querySelectorAll('.nav button').forEach(b=>b.addEventListener('click',()=>showPage(b.dataset.page)));
+function updateUI(){
+ const sec=elapsed(),km=run?run.distance/1000:0,avg=sec>0&&km>0?km/(sec/3600):0;
+ $('distance').textContent=km.toFixed(2);$('elapsed').textContent=fmtTime(sec);$('speed').textContent=currentSpeed().toFixed(1);$('pace').textContent=pace(km,sec);$('avgSpeed').textContent=avg.toFixed(1);$('maxSpeed').textContent=(run?run.maxSpeed:0).toFixed(1);
+ const weight=Number(db.settings.weight)||60;$('calories').textContent=Math.round(km*weight*.9);
+ $('runState').textContent=run?(run.paused?'Ⅱ PAUSED':'● RUNNING'):'● NOT RUNNING';$('gpsStatus').textContent=run?(run.paused?'Run paused':(run.gps?'GPS tracking active':'Waiting for GPS fix')):'GPS waiting for permission';
+ $('startBtn').disabled=!!run;$('pauseBtn').disabled=!run;$('stopBtn').disabled=!run;$('pauseBtn').textContent=run&&run.paused?'▶ RESUME':'Ⅱ PAUSE';
+ const goal=Number(db.settings.goal)||5,td=totalToday();$('goalDistance').textContent=`${td.toFixed(1)} / ${goal}`;$('goalBar').style.width=Math.min(100,td/goal*100)+'%';$('todayBar').style.width=Math.min(100,td/goal*100)+'%';$('todayRuns').textContent=db.runs.filter(r=>new Date(r.date).toDateString()===new Date().toDateString()).length+' runs';
+ $('lapCount').textContent=laps.length;$('lapMeters').textContent=Number($('lapLength').value)||400;
+}
+function resetLines(){if(routeLine)routeLine.setLatLngs([]);if(groundLine)groundLine.setLatLngs([]);if(marker){map.removeLayer(marker);marker=null}if(groundMarker){groundMap.removeLayer(groundMarker);groundMarker=null}}
+function acquireWakeLock(){if($('wakeLock').checked&&'wakeLock'in navigator){navigator.wakeLock.request('screen').then(x=>wakeLockRef=x).catch(()=>{})}}
+function releaseWakeLock(){if(wakeLockRef){wakeLockRef.release().catch(()=>{});wakeLockRef=null}}
+function startRun(){
+ if(!navigator.geolocation){toast('GPS is not supported by this browser.');return}
+ if(!window.isSecureContext && location.protocol!=='file:'){toast('Location needs HTTPS or a local file.');}
+ run={date:new Date().toISOString(),startedAt:Date.now(),elapsedBefore:0,distance:0,currentSpeed:0,maxSpeed:0,coords:[],gps:false,paused:false,lastPoint:null,lastAcceptedAt:0,lastLapAt:0,mode:document.getElementById('groundPage').classList.contains('active')?'ground':'outdoor'};
+ laps=[];renderLaps();resetLines();$('startBtn').disabled=true;
+ watchId=navigator.geolocation.watchPosition(onPosition,onGeoError,{enableHighAccuracy:true,maximumAge:1000,timeout:20000});
+ timer=setInterval(updateUI,500);acquireWakeLock();updateUI();toast('Run started. Allow location access and keep GPS on.');
+}
+function onPosition(pos){
+ if(!run||run.paused)return;
+ const c={lat:pos.coords.latitude,lng:pos.coords.longitude,accuracy:pos.coords.accuracy||999,time:pos.timestamp||Date.now(),speed:pos.coords.speed};
+ $('accuracy').textContent='GPS accuracy: '+Math.round(c.accuracy)+' m';
+ if(c.accuracy>60){$('gpsStatus').textContent='Weak GPS accuracy · '+Math.round(c.accuracy)+' m';return}
+ run.gps=true;
+ if(!run.lastPoint){run.lastPoint=c;run.coords.push(c);centerOn(c);addRoutePoint(c);updateUI();return}
+ const delta=haversine(run.lastPoint,c),dt=Math.max(.1,(c.time-run.lastPoint.time)/1000),calculated=delta/dt*3.6;
+ if(delta<2 || delta>100 || (calculated>35 && !c.speed)){return}
+ if(delta/Math.max(dt,1)*3.6>45)return;
+ run.distance+=delta;run.currentSpeed=(typeof c.speed==='number'&&c.speed>=0)?c.speed*3.6:calculated;run.maxSpeed=Math.max(run.maxSpeed,run.currentSpeed);
+ run.coords.push(c);run.lastPoint=c;run.lastAcceptedAt=Date.now();addRoutePoint(c);centerOn(c);
+ if($('autoPause').checked&&run.currentSpeed<1&&Date.now()-lastAutoPause>30000){lastAutoPause=Date.now();}
+ autoLapCheck();announcementCheck();updateUI();
+}
+function addRoutePoint(c){const ll=[c.lat,c.lng];routeLine.addLatLng(ll);groundLine.addLatLng(ll);if(marker)marker.setLatLng(ll);else marker=L.circleMarker(ll,{radius:7,color:'#fff',weight:2,fillColor:'#ff3038',fillOpacity:1}).addTo(map);if(groundMarker)groundMarker.setLatLng(ll);else groundMarker=L.circleMarker(ll,{radius:7,color:'#fff',weight:2,fillColor:'#ff3038',fillOpacity:1}).addTo(groundMap)}
+function centerOn(c){if(run.coords.length===1){map.setView([c.lat,c.lng],17);groundMap.setView([c.lat,c.lng],17)}}
+function onGeoError(e){let msg=e.code===1?'Location permission denied. Allow location in browser settings.':e.code===2?'GPS position unavailable. Turn on device location.':'GPS timed out. Move outdoors and try again.';$('gpsStatus').textContent=msg;toast(msg)}
+function pauseRun(){if(!run)return;if(!run.paused){run.elapsedBefore=elapsed();run.paused=true;if(watchId!==null)navigator.geolocation.clearWatch(watchId);watchId=null;releaseWakeLock();}else{run.paused=false;run.startedAt=Date.now();run.lastPoint=null;watchId=navigator.geolocation.watchPosition(onPosition,onGeoError,{enableHighAccuracy:true,maximumAge:1000,timeout:20000});acquireWakeLock()}updateUI()}
+function autoLapCheck(){if(!$('autoLap').checked||!run)return;let len=(Number($('lapLength').value)||400);if(run.distance-run.lastLapAt>=len){recordLap(len);run.lastLapAt+=len}}
+function recordLap(distance){if(!run)return;let sec=elapsed(),prev=laps.length?laps[laps.length-1].elapsed:0;let lap={number:laps.length+1,distance:distance||((Number($('lapLength').value)||400)),elapsed:sec-prev,totalElapsed:sec};laps.push(lap);renderLaps();$('lapCount').textContent=laps.length;announce(`Lap ${lap.number}. ${Math.round(lap.distance)} metres.`,`${lap.number} laps completed.`)}
+function renderLaps(){$('lapList').innerHTML=laps.length?laps.map(l=>`<div class="lap-row"><span>${l.number}</span><span>${Math.round(l.distance)} m</span><span>${fmtTime(l.elapsed)}</span><span>${pace(l.distance/1000,l.elapsed)}</span></div>`).join(''):'<div class="empty">Your lap splits will appear here.</div>'}
+function manualLap(){if(!run){toast('Start a run first.');return}let distance=Math.min(Number($('lapLength').value)||400,run.distance-(laps.reduce((a,l)=>a+l.distance,0)));if(distance<=0)distance=Number($('lapLength').value)||400;recordLap(distance);run.lastLapAt=run.distance}
+function announcementCheck(){if(!$('voiceEnabled').checked||!run)return;let interval=(Number($('announceEvery').value)||1)*1000,mark=Math.floor(run.distance/interval);if(mark>lastAnnouncement){lastAnnouncement=mark;const km=run.distance/1000,sec=elapsed();announce(`${km.toFixed(1)} kilometres complete. Time ${fmtTime(sec)}.`,`You have completed ${km.toFixed(1)} kilometres in ${fmtTime(sec)}.`)}}
+function announce(hi,en){if(!$('voiceEnabled').checked||!('speechSynthesis'in window))return;let lang=$('voiceLang').value;let text=lang==='hi'?hi:lang==='en'?en:hi+' '+en;window.speechSynthesis.cancel();let u=new SpeechSynthesisUtterance(text);u.lang=lang==='en'?'en-IN':'hi-IN';u.rate=1;window.speechSynthesis.speak(u)}
+function finishRun(){if(!run)return;let sec=elapsed();if(watchId!==null)navigator.geolocation.clearWatch(watchId);watchId=null;clearInterval(timer);timer=null;releaseWakeLock();if(window.speechSynthesis)window.speechSynthesis.cancel();const result={id:Date.now(),date:run.date,distance:run.distance/1000,seconds:sec,maxSpeed:run.maxSpeed,avgSpeed:sec?run.distance/1000/(sec/3600):0,calories:Math.round(run.distance/1000*(Number(db.settings.weight)||60)*.9),coords:run.coords,laps:laps.slice(),mode:run.mode};if(result.distance>=.01&&sec>=3){db.runs.unshift(result);persist();toast('Run saved successfully!')}else toast('Run was too short; not saved.');run=null;lastAnnouncement=0;updateUI();renderHistory()}
+function renderHistory(){
+ const total=db.runs.reduce((a,r)=>a+r.distance,0),seconds=db.runs.reduce((a,r)=>a+r.seconds,0);$('totalDistance').textContent=total.toFixed(1);$('totalTime').textContent=(seconds/3600).toFixed(1)+'h';$('totalRuns').textContent=db.runs.length;
+ let best=db.runs.filter(r=>r.distance>=1).map(r=>r.seconds/r.distance).sort((a,b)=>a-b)[0];$('bestPace').textContent=best?`${Math.floor(best/60)}:${String(Math.floor(best%60)).padStart(2,'0')}`:'—';
+ $('historyList').innerHTML=db.runs.length?db.runs.map(r=>`<div class="history-item"><div class="row"><h3>${new Date(r.date).toLocaleDateString()} · ${r.mode==='ground'?'Ground':'Outdoor'}</h3><span class="tiny">${new Date(r.date).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}</span></div><div class="history-grid"><div>Distance<b>${r.distance.toFixed(2)} km</b></div><div>Duration<b>${fmtTime(r.seconds)}</b></div><div>Avg speed<b>${(r.avgSpeed||0).toFixed(1)} km/h</b></div></div><div class="row" style="margin-top:10px"><span class="tiny">${r.laps?.length||0} laps · ${r.coords?.length||0} GPS points</span><button class="btn outline" style="padding:6px 10px;font-size:10px" data-route="${r.id}">VIEW ROUTE</button></div></div>`).join(''):'<div class="empty">No runs saved yet. Complete your first run!</div>';
+ document.querySelectorAll('[data-route]').forEach(b=>b.addEventListener('click',()=>{let r=db.runs.find(x=>x.id==b.dataset.route);if(!r||!r.coords?.length){toast('No GPS route saved for this run.');return}showPage('homePage');setTimeout(()=>{let pts=r.coords.map(c=>[c.lat,c.lng]);routeLine.setLatLngs(pts);map.fitBounds(routeLine.getBounds(),{padding:[25,25]});toast('Showing saved route on map.')},150)}));
+}
+function saveSettings(){db.settings.name=$('userName').value.trim();db.settings.weight=Number($('weight').value)||60;db.settings.goal=Number($('dailyGoal').value)||5;persist();$('profileBtn').textContent=(db.settings.name||'RM').slice(0,2).toUpperCase();updateUI();toast('Settings saved.')}
+function exportFile(name,content,type){let blob=new Blob([content],{type}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url)}
+function exportCSV(){let rows=[['Date','Mode','Distance km','Duration sec','Average speed kmh','Max speed kmh','Calories','Laps']];db.runs.forEach(r=>rows.push([r.date,r.mode,r.distance,r.seconds,r.avgSpeed,r.maxSpeed,r.calories,r.laps?.length||0]));let csv=rows.map(r=>r.map(x=>'"'+String(x??'').replaceAll('"','""')+'"').join(',')).join('\n');exportFile('run-master-history.csv',csv,'text/csv')}
+function loadSettings(){let s=db.settings;$('userName').value=s.name||'';$('weight').value=s.weight||60;$('dailyGoal').value=s.goal||5;$('voiceEnabled').checked=s.voiceEnabled!==false;$('voiceLang').value=s.voiceLang||'both';$('announceEvery').value=s.announceEvery||'1';$('autoPause').checked=!!s.autoPause;$('wakeLock').checked=s.wakeLock!==false;$('profileBtn').textContent=(s.name||'RM').slice(0,2).toUpperCase()}
+$('startBtn').addEventListener('click',startRun);$('groundStart').addEventListener('click',()=>{showPage('groundPage');if(!run)startRun();else toast('A run is already active.')});$('pauseBtn').addEventListener('click',pauseRun);$('stopBtn').addEventListener('click',finishRun);$('manualLap').addEventListener('click',manualLap);$('saveSettings').addEventListener('click',saveSettings);$('exportCsv').addEventListener('click',exportCSV);
+$('exportJson').addEventListener('click',()=>exportFile('run-master-backup.json',JSON.stringify(db,null,2),'application/json'));
+$('clearHistory').addEventListener('click',()=>{if(confirm('Delete all saved running history? This cannot be undone.')){db.runs=[];persist();renderHistory();updateUI();toast('History deleted.')}});
+$('lapLength').addEventListener('input',()=>{$('lapMeters').textContent=Number($('lapLength').value)||400});
+$('voiceEnabled').addEventListener('change',()=>{db.settings.voiceEnabled=$('voiceEnabled').checked;persist()});
+['voiceLang','announceEvery','autoPause','wakeLock'].forEach(id=>$(id).addEventListener('change',()=>{db.settings.voiceLang=$('voiceLang').value;db.settings.announceEvery=$('announceEvery').value;db.settings.autoPause=$('autoPause').checked;db.settings.wakeLock=$('wakeLock').checked;persist()}));
+$('profileBtn').addEventListener('click',()=>showPage('settingsPage'));
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&run&&!run.paused)acquireWakeLock()});
+loadSettings();initMap();renderHistory();updateUI();
+})();
+</script>
+<script>
+if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost")) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./sw.js").catch(err => console.warn("PWA service worker:", err));
+  });
+}
+</script>
+</body></html>
